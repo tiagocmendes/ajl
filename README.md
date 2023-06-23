@@ -1,2 +1,1 @@
-# ajl
-Associação Juvenil de Lordosa website
+# Website - Associação Juvenil de Lordosa 
