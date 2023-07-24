@@ -13,9 +13,9 @@ export const StyledGroupStages = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
-    gap: 10rem;
+    gap: 5rem;
     margin: 5rem 0;
     @media (max-width: 700px) {
         flex-direction: column;
@@ -56,7 +56,7 @@ export const StyledTableCell = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 10%;
+    width: 8%;
     padding: 1rem 0;
 `
 
@@ -64,7 +64,7 @@ export const StyledTeamNameCell = styled.div`
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    width: 30%;
+    width: 55%;
     padding: 1rem;
 `
 

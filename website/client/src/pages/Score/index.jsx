@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 import { 
     ScoreContainer, StyledGroupStages, StyledTable, StyledTableHeader,
@@ -9,98 +10,21 @@ import {
 
 const Score: React.FC = () => {
 
-    const groupStages = [
-        {
-            name: "Grupo A",
-            teams: [
-                {
-                    name: "Equipa 1",
-                    rating: 1,
-                    victories: 3,
-                    draws: 0,
-                    losses: 0,
-                    scoredGoals: 10,
-                    concededGoals: 2,
-                    points: 9
-                },
-                {
-                    name: "Equipa 2",
-                    rating: 2,
-                    victories: 1,
-                    draws: 1,
-                    losses: 0,
-                    scoredGoals: 11,
-                    concededGoals: 2,
-                    points: 4
-                },
-                {
-                    name: "Equipa 3",
-                    rating: 3,
-                    victories: 1,
-                    draws: 1,
-                    losses: 0,
-                    scoredGoals: 10,
-                    concededGoals: 2,
-                    points: 4
-                },
-                {
-                    name: "Equipa 4",
-                    rating: 4,
-                    victories: 0,
-                    draws: 0,
-                    losses: 3,
-                    scoredGoals: 2,
-                    concededGoals: 10,
-                    points: 0
-                }
-            ]
-        },
-        {
-            name: "Grupo B",
-            teams: [
-                {
-                    name: "Equipa 5",
-                    rating: 1,
-                    victories: 3,
-                    draws: 0,
-                    losses: 0,
-                    scoredGoals: 10,
-                    concededGoals: 2,
-                    points: 9
-                },
-                {
-                    name: "Equipa 6",
-                    rating: 2,
-                    victories: 1,
-                    draws: 1,
-                    losses: 0,
-                    scoredGoals: 11,
-                    concededGoals: 2,
-                    points: 4
-                },
-                {
-                    name: "Equipa 7",
-                    rating: 3,
-                    victories: 1,
-                    draws: 1,
-                    losses: 0,
-                    scoredGoals: 10,
-                    concededGoals: 2,
-                    points: 4
-                },
-                {
-                    name: "Equipa 8",
-                    rating: 4,
-                    victories: 0,
-                    draws: 0,
-                    losses: 3,
-                    scoredGoals: 2,
-                    concededGoals: 10,
-                    points: 0
-                }
-            ]
-        }
-    ]
+    const [groupStages, setGroupStages] = useState([]);
+
+    useEffect(() => {
+        const fetchClassification = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/groups`);
+                setGroupStages(response.data)
+                console.log(response.data)
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchClassification();
+    }, []);
 
     const knockOutStages = [
         {
@@ -169,7 +93,7 @@ const Score: React.FC = () => {
             <h1>Fase de Grupos</h1>
             <StyledGroupStages>
                 {
-                    groupStages.map(group => (
+                    groupStages.length > 0 && groupStages.map(group => (
                         <StyledTable>
                             <StyledTableHeader>{group.name}</StyledTableHeader>
                             <StyledTableRow>
@@ -199,10 +123,10 @@ const Score: React.FC = () => {
                                 </StyledTableCell>
                             </StyledTableRow>
                             {
-                                group.teams.map(team => (
+                                group.teams.map((team, index) => (
                                     <StyledTableRow>
                                         <StyledTableCell>
-                                            {team.rating}
+                                            {index + 1}
                                         </StyledTableCell>
                                         <StyledTeamNameCell>
                                             {team.name}
@@ -217,10 +141,10 @@ const Score: React.FC = () => {
                                             {team.losses}
                                         </StyledTableCell>
                                         <StyledTableCell>
-                                            {team.scoredGoals}
+                                            {team.gm}
                                         </StyledTableCell>
                                         <StyledTableCell>
-                                            {team.concededGoals}
+                                            {team.gs}
                                         </StyledTableCell>
                                         <StyledTableCell>
                                             {team.points}

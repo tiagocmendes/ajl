@@ -34,12 +34,7 @@ export const StyledBody = styled.div`
     margin: 1rem 0;
 `
 
-interface StyledBodyRowProps {
-    isHeader: boolean;
-    isEven: boolean;
-}
-
-export const StyledBodyRow = styled.div<StyledBodyRowProps>`
+export const StyledBodyRow = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
