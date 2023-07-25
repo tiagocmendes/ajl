@@ -1,49 +1,82 @@
 const knockouts = [
     {
         name: "quarters",
-        timestamps: [
-            (new Date("2023-07-30 09:00")).getTime(),
-            (new Date("2023-07-30 10:00")).getTime(),
-            (new Date("2023-07-30 11:00")).getTime(),
-            (new Date("2023-07-30 12:00")).getTime(),
+        games: [
+            {
+                firstTeam: '1º Grupo A',
+                secondTeam: '4º Grupo B',
+                timestamp: (new Date("2023-07-30 09:00")).getTime()
+            },
+            {
+                firstTeam: '1º Grupo B',
+                secondTeam: '4º Grupo A',
+                timestamp: (new Date("2023-07-30 10:00")).getTime(),
+            },
+            {
+                firstTeam: '2º Grupo A',
+                secondTeam: '3º Grupo B',
+                timestamp: (new Date("2023-07-30 11:00")).getTime(),
+            },
+            {
+                firstTeam: '2º Grupo B',
+                secondTeam: '3º Grupo A',
+                timestamp: (new Date("2023-07-30 12:00")).getTime(),
+            },
         ]
     },
     {
         name: "semi",
-        timestamps: [
-            (new Date("2023-07-30 16:00")).getTime(),
-            (new Date("2023-07-30 17:00")).getTime(),
+        games: [
+            {
+                firstTeam: 'Vencedor Jogo 21',
+                secondTeam: 'Vencedor Jogo 24',
+                timestamp: (new Date("2023-07-30 16:00")).getTime()
+            },
+            {
+                firstTeam: 'Vencedor Jogo 22',
+                secondTeam: 'Vencedor Jogo 23',
+                timestamp: (new Date("2023-07-30 17:00")).getTime(),
+            },
         ]
     },
     {
         name: "pre-final",
-        timestamps: [
-            (new Date("2023-07-30 18:00")).getTime(),
+        games: [
+            {
+                firstTeam: 'Derrotado Jogo 25',
+                secondTeam: 'Derrotado Jogo 26',
+                timestamp: (new Date("2023-07-30 18:00")).getTime(),
+            },
         ]
     },
     {
         name: "final",
-        timestamps: [
-            (new Date("2023-07-30 19:00")).getTime(),
+        games: [
+            {
+                firstTeam: 'Vencedor Jogo 25',
+                secondTeam: 'Vencedor Jogo 26',
+                timestamp: (new Date("2023-07-30 19:00")).getTime(),
+            },
         ]
     }
 ]
 
 const games = [];
-let gameNumber = 19;
+let gameNumber = 21;
 for(const stage of knockouts) {
-    for(const timestamp of stage.timestamps) {
+    for(const game of stage.games) {
         games.push({
             gameNumber,
             phase: stage.name,
-            timestamp,
+            timestamp: game.timestamp,
+            hasStarted: false,
             "firstTeam": {
-                "name": 'Por definir',
+                "name": game.firstTeam,
                 "goals": 0,
                 "scorers": []
             },
             "secondTeam": {
-                "name": 'Por definir',
+                "name": game.secondTeam,
                 "goals": 0,
                 "scorers": []
             },

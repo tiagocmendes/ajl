@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 
 import { 
@@ -8,85 +8,100 @@ import {
     StyledDivider, StyledKnockOutHeader, StyledKnockOutBody
 } from './style';
 
-const Score: React.FC = () => {
+const Score = () => {
 
     const [groupStages, setGroupStages] = useState([]);
+    const [knockOutStages, setKnockoutStages] = useState({});
 
     useEffect(() => {
         const fetchClassification = async () => {
             try {
                 const response = await axios.get(`http://localhost:8080/groups`);
                 setGroupStages(response.data)
-                console.log(response.data)
             } catch (error) {
                 console.error(error);
             }
         };
 
+        const fetchKnockouts = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/knockouts`);
+                setKnockoutStages(response.data)
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
         fetchClassification();
+        fetchKnockouts();
     }, []);
 
-    const knockOutStages = [
-        {
-            name: 'Quartos-de-Final',
-            column: 1,
-            games: [
+    const formattedKnockOutStages = useMemo(() => {
+        if(Object.keys(knockOutStages).length > 0) {
+            return [
                 {
-                    teamA: "Equipa 1",
-                    teamB: "Equipa 8"
+                    name: 'Quartos-de-Final',
+                    column: 1,
+                    games: [
+                        {
+                            firstTeam: knockOutStages?.quarters[0].firstTeam.name,
+                            secondTeam: knockOutStages?.quarters[0].secondTeam.name,
+                        },
+                        {
+                            firstTeam: knockOutStages?.quarters[3].firstTeam.name,
+                            secondTeam: knockOutStages?.quarters[3].secondTeam.name,
+                        }
+                    ]
                 },
                 {
-                    teamA: "Equipa 3",
-                    teamB: "Equipa 6"
-                }
+                    name: 'Meias-finais',
+                    column: 2,
+                    games: [
+                        {
+                            firstTeam: knockOutStages?.semi[0].firstTeam.name,
+                            secondTeam: knockOutStages?.semi[0].secondTeam.name,
+                        },
+                    ],
+                },
+                {
+                    name: 'Final',
+                    column: 3,
+                    games: [
+                        {
+                            firstTeam: knockOutStages?.final[0].firstTeam.name,
+                            secondTeam: knockOutStages?.final[0].secondTeam.name,
+                        },
+                    ],
+                },
+                {
+                    name: 'Meias-finais',
+                    column: 4,
+                    games: [
+                        {
+                            firstTeam: knockOutStages?.semi[1].firstTeam.name,
+                            secondTeam: knockOutStages?.semi[1].secondTeam.name,
+                        },
+                    ],
+                },
+                {
+                    name: 'Quartos-de-Final',
+                    column: 5,
+                    games: [
+                        {
+                            firstTeam: knockOutStages?.quarters[1].firstTeam.name,
+                            secondTeam: knockOutStages?.quarters[1].secondTeam.name,
+                        },
+                        {
+                            firstTeam: knockOutStages?.quarters[2].firstTeam.name,
+                            secondTeam: knockOutStages?.quarters[2].secondTeam.name,
+                        }
+                    ]
+                },
             ]
+        } 
 
-        },
-        {
-            name: 'Meias-finais',
-            column: 2,
-            games: [
-                {
-                    teamA: "Equipa 1",
-                    teamB: "Equipa 6"
-                }
-            ],
-        },
-        {
-            name: 'Final',
-            column: 3,
-            games: [
-                {
-                    teamA: "Equipa 1",
-                    teamB: "Equipa 5"
-                }
-            ],
-        },
-        {
-            name: 'Meias-finais',
-            column: 4,
-            games: [
-                {
-                    teamA: "Equipa 2",
-                    teamB: "Equipa 5"
-                }
-            ],
-        },
-        {
-            name: 'Quartos-de-Final',
-            column: 5,
-            games: [
-                {
-                    teamA: "Equipa 2",
-                    teamB: "Equipa 7"
-                },
-                {
-                    teamA: "Equipa 4",
-                    teamB: "Equipa 5"
-                }
-            ]
-        },
-    ]
+        return [];
+    }, [knockOutStages])
 
     return (
         <ScoreContainer> 
@@ -160,20 +175,20 @@ const Score: React.FC = () => {
             <StyledKnockOutStage>
                 <StyledKnockOutHeader>
                 {
-                    knockOutStages.map(stage => (
+                    formattedKnockOutStages.length > 0 && formattedKnockOutStages.map(stage => (
                         <StyledKnockOutColumn>{stage.name}</StyledKnockOutColumn>
                     ))
                 }
                 </StyledKnockOutHeader>
                 <StyledKnockOutBody>
-                {knockOutStages.map((stage, index)=> (
+                {formattedKnockOutStages.length > 0 && formattedKnockOutStages.map((stage, index)=> (
                     <StyledKnockOutColumn isOdd={index % 2 === 0}>
                     {   
                         stage.games.map(game => (
                             <StyledKnockOutGame>
-                                <span>{game.teamA}</span>
+                                <span>{game.firstTeam}</span>
                                 <StyledDivider />
-                                <span>{game.teamB}</span>
+                                <span>{game.secondTeam}</span>
                             </StyledKnockOutGame>
                         ))
                     }

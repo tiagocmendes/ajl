@@ -15,6 +15,10 @@ const gameSchema = new mongoose.Schema({
         required: true,
         default: false
     },
+    winner: {
+        type: String,
+        default: ''
+    },
     timestamp: {
         type:   String,
         required: true

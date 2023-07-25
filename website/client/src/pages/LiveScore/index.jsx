@@ -55,8 +55,8 @@ const LiveScore = () => {
                 <StyledTableScore>
                     <StyledTableHeader>
                         <StyledTableTeamName><h2>{game.firstTeam.name}</h2></StyledTableTeamName>
-                        <StyledTableScoreCell><h2>{game.firstTeam.goals}</h2></StyledTableScoreCell>
-                        <StyledTableScoreCell><h2>{game.secondTeam.goals}</h2></StyledTableScoreCell>
+                        <StyledTableScoreCell><h2>{game.hasStarted ? game.firstTeam.goals : '-'}</h2></StyledTableScoreCell>
+                        <StyledTableScoreCell><h2>{game.hasStarted ? game.secondTeam.goals : '-'}</h2></StyledTableScoreCell>
                         <StyledTableTeamName><h2>{game.secondTeam.name}</h2></StyledTableTeamName>
                     </StyledTableHeader>
                     <StyledTableBody>

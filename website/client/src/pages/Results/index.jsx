@@ -42,7 +42,9 @@ const Results = () => {
     useEffect(() => {
         const fetchGames = async () => {
             try {
+                await axios.get(`http://localhost:8080/knockouts`);
                 const response = await axios.get(`http://localhost:8080/games`);
+
                 setGames(response.data);
             } catch (error) {
                 console.error(error);
@@ -97,10 +99,10 @@ const Results = () => {
                                                 {game.firstTeam.name}
                                             </StyledCell>
                                             <StyledCell>
-                                                {game.firstTeam.goals}
+                                                {game.hasStarted ? game.firstTeam.goals : '-'}
                                             </StyledCell>
                                             <StyledCell>
-                                                {game.secondTeam.goals}
+                                                {game.hasStarted ? game.secondTeam.goals : '-'}
                                             </StyledCell>
                                             <StyledCell>
                                                 {game.secondTeam.name}

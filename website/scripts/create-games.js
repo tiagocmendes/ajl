@@ -12,9 +12,7 @@ const teams = [
     'RO SERRALHARIA',
     "GABRIEL TEAM",
     "3 POR 1",
-    "BRAZUCAS"
 ];
-
 
 const groups = [
     {
@@ -23,48 +21,42 @@ const groups = [
             'AL CFV',
             'SEM NOME',
             'PAVIMIKE FC',
-            '3 POR 1'
+            'FERRAGENS PEREIRA',
+            'VM CAR AUTOMÓVEIS',
         ],
         timestamps: [
             (new Date("2023-07-29 09:00")).getTime(),
-            (new Date("2023-07-29 11:00")).getTime(),
-            (new Date("2023-07-29 15:00")).getTime(),
-            (new Date("2023-07-29 17:00")).getTime(),
-            (new Date("2023-07-29 19:00")).getTime(),
-            (new Date("2023-07-29 21:00")).getTime()
+            (new Date("2023-07-29 10:10")).getTime(),
+            (new Date("2023-07-29 11:20")).getTime(),
+            (new Date("2023-07-29 12:30")).getTime(),
+            (new Date("2023-07-29 15:35")).getTime(),
+            (new Date("2023-07-29 16:45")).getTime(),
+            (new Date("2023-07-29 17:55")).getTime(),
+            (new Date("2023-07-29 19:05")).getTime(),
+            (new Date("2023-07-29 20:15")).getTime(),
+            (new Date("2023-07-29 21:25")).getTime()
         ]
     },
     {
         name: "B",
         teams: [
-            'FERRAGENS PEREIRA',
-            'VM CAR AUTOMÓVEIS',
             '100 PERNAS',
-            'BRAZUCAS'
-        ],
-        timestamps: [
-            (new Date("2023-07-29 09:40")).getTime(),
-            (new Date("2023-07-29 11:40")).getTime(),
-            (new Date("2023-07-29 15:40")).getTime(),
-            (new Date("2023-07-29 17:40")).getTime(),
-            (new Date("2023-07-29 19:40")).getTime(),
-            (new Date("2023-07-29 21:40")).getTime()
-        ]
-    },
-    {
-        name: "C",
-        teams: [
             "TASCA D'ALDEIA",
             'RO SERRALHARIA',
-            "GABRIEL TEAM"
+            "GABRIEL TEAM",
+            "3 POR 1",
         ],
         timestamps: [
-            (new Date("2023-07-29 10:20")).getTime(),
-            (new Date("2023-07-29 12:20")).getTime(),
-            (new Date("2023-07-29 16:20")).getTime(),
-            (new Date("2023-07-29 18:20")).getTime(),
-            (new Date("2023-07-29 20:20")).getTime(),
-            (new Date("2023-07-29 22:20")).getTime()
+            (new Date("2023-07-29 09:35")).getTime(),
+            (new Date("2023-07-29 10:45")).getTime(),
+            (new Date("2023-07-29 11:55")).getTime(),
+            (new Date("2023-07-29 15:00")).getTime(),
+            (new Date("2023-07-29 16:10")).getTime(),
+            (new Date("2023-07-29 17:20")).getTime(),
+            (new Date("2023-07-29 18:30")).getTime(),
+            (new Date("2023-07-29 19:40")).getTime(),
+            (new Date("2023-07-29 20:50")).getTime(),
+            (new Date("2023-07-29 22:00")).getTime()
         ]
     }
 ]
@@ -86,47 +78,43 @@ for(const group of groups) {
     const groupCombinations = generateGroupCombinations(group.teams);
     let timestamp = 0;
     
-    const stop = group.name !== 'C' ? 1 : 2;
+    // const firstTeamGoals = Math.round(Math.random() * 4);
+    // const secondTeamGoals = Math.round(Math.random() * 4);
+    // const firstTeamScorers = [];
+    // const secondTeamScorers = [];
 
-    for(let i = 0; i < stop; i++) {
-        const firstTeamGoals = Math.round(Math.random() * 4);
-        const secondTeamGoals = Math.round(Math.random() * 4);
-        const firstTeamScorers = [];
-        const secondTeamScorers = [];
+    // for(let scorer = 0; scorer < firstTeamGoals; scorer++) {
+    //     firstTeamScorers.push({
+    //         name: "Tiago Mendes",
+    //         minute: Math.round(Math.random() * 30)
+    //     })
+    // }
 
-        for(let scorer = 0; scorer < firstTeamGoals; scorer++) {
-            firstTeamScorers.push({
-                name: "Tiago Mendes",
-                minute: Math.round(Math.random() * 30)
-            })
+    // for(let scorer = 0; scorer < secondTeamGoals; scorer++) {
+    //     secondTeamScorers.push({
+    //         name: "Tiago Mendes",
+    //         minute: Math.round(Math.random() * 30)
+    //     })
+    // }
+
+    for(const combination of groupCombinations) {
+        games.push({
+            phase: group.name,
+            timestamp: group.timestamps[timestamp],
+            hasStarted: false,
+            "firstTeam": {
+                "name": combination.firstTeam,
+                "goals": 0,
+                "scorers": []
+            },
+            "secondTeam": {
+                "name": combination.secondTeam,
+                "goals": 0,
+                "scorers": []
+            },
+        })
+        timestamp++;
         }
-
-        for(let scorer = 0; scorer < secondTeamGoals; scorer++) {
-            secondTeamScorers.push({
-                name: "Tiago Mendes",
-                minute: Math.round(Math.random() * 30)
-            })
-        }
-
-        for(const combination of groupCombinations) {
-            games.push({
-                phase: group.name,
-                timestamp: group.timestamps[timestamp],
-                hasStarted: true,
-                "firstTeam": {
-                    "name": combination.firstTeam,
-                    "goals": firstTeamGoals,
-                    "scorers": firstTeamScorers
-                },
-                "secondTeam": {
-                    "name": combination.secondTeam,
-                    "goals": secondTeamGoals,
-                    "scorers": secondTeamScorers
-                },
-            })
-            timestamp++;
-        }
-    }
 }
 
 const sortedGames = games.sort((g1, g2) => g1.timestamp - g2.timestamp).map((game, index) => {
@@ -160,7 +148,3 @@ async function saveGamesToAPI() {
 }
 
 saveGamesToAPI();
-
-
-  
-  

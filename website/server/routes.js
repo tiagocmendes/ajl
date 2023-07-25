@@ -1,9 +1,9 @@
 const express = require('express');
-const User = require('./user');
-
 const Game = require('./models/game');
 
 const router = express.Router();
+
+const { getGroupsClassification } = require('./helpers/groups');
 
 // Create a new game
 router.post('/games', async (req, res) => {
@@ -70,7 +70,7 @@ router.delete('/games/:id', async (req, res) => {
 // PATCH a game's scorers and goals by ID
 router.patch('/games/:id', async (req, res) => {
   const gameId = req.params.id;
-  const { firstTeam, secondTeam } = req.body;
+  const { firstTeam, secondTeam, hasStarted, winner } = req.body;
 
   try {
     const game = await Game.findOne({ gameNumber: gameId });
@@ -97,6 +97,14 @@ router.patch('/games/:id', async (req, res) => {
       game.secondTeam.goals = secondTeam.goals ? secondTeam.goals : game.secondTeam.goals;
     }
 
+    if(hasStarted !== undefined) {
+      game.hasStarted = hasStarted;
+    }
+
+    if(winner !== undefined) {
+      game.winner = winner;
+    }
+
     // Save the updated game object to the database
     const updatedGame = await game.save();
 
@@ -119,141 +127,82 @@ router.delete('/games', async (req, res) => {
   }
 });
 
-const initTeamDetails = (name) => {
-  return {
-    name,
-    victories: 0,
-    draws: 0,
-    losses: 0,
-    gm: 0,
-    gs: 0,
-    points: 0
-  }
-}
-
 // Get all games
 router.get('/groups', async (req, res) => {
   try {
-    const groupA = await Game.find({ phase: "A" });
-    const groupB = await Game.find({ phase: "B" });
-    const groupC = await Game.find({ phase: "C" });
-    const groups = [
-      {name: 'A', games: groupA}, 
-      {name: 'B', games: groupB}, 
-      {name: 'C', games: groupC}, 
-    ];
+    const groupsClassification = await getGroupsClassification();
+    res.send(groupsClassification);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
 
-    const groupStages = [];
-    for(const group of groups) {
-      let classification = {};
-      for(const game of group.games) {
-        const firstTeam = game.firstTeam;
-        const secondTeam = game.secondTeam;
+router.get('/knockouts', async (req, res) => {
+  try {
+    const quarters = await Game.find({ phase: "quarters" });
+    const semi = await Game.find({ phase: "semi" });
+    const preFinal = await Game.find({ phase: "pre-final" });
+    const final = await Game.find({ phase: "final" });
 
-        if(!classification[firstTeam.name]) {
-          classification[firstTeam.name] = initTeamDetails(firstTeam.name)
-        }
+    const groupsClassification = await getGroupsClassification();
 
-        if(!classification[secondTeam.name]) {
-          classification[secondTeam.name] = initTeamDetails(secondTeam.name)
-        }
+    for(const group of groupsClassification) {
+      const teamsThatPlayedAllMatches = group.teams.filter(team => team.victories + team.draws + team.losses === group.teams.length - 1);
+      const allMatchesPlayed = teamsThatPlayedAllMatches.length === group.teams.length;
 
-        if(game.hasStarted) {
-          // Update first team goals
-          classification[firstTeam.name].gm += firstTeam.goals;
-          classification[firstTeam.name].gs += secondTeam.goals;
-
-          // Update second team goals
-          classification[secondTeam.name].gm += secondTeam.goals;
-          classification[secondTeam.name].gs += firstTeam.goals;
-
-          if(firstTeam.goals > secondTeam.goals) {
-            classification[firstTeam.name].victories += 1;
-            classification[secondTeam.name].losses += 1;
-            classification[firstTeam.name].points += 3;
-          } else if(firstTeam.goals < secondTeam.goals) {
-            classification[firstTeam.name].losses += 1;
-            classification[secondTeam.name].victories += 1;
-            classification[secondTeam.name].points += 3;
-          } else {
-            classification[firstTeam.name].draws += 1;
-            classification[secondTeam.name].draws += 1;
-            classification[firstTeam.name].points += 1;
-            classification[secondTeam.name].points += 1;
-          }
+      if(allMatchesPlayed) {
+        if(group.name === 'A') {
+          quarters[0].firstTeam.name = group.teams[0].name;
+          quarters[1].secondTeam.name = group.teams[3].name;
+          quarters[2].firstTeam.name = group.teams[1].name;
+          quarters[3].secondTeam.name = group.teams[2].name;
+        } else if(group.name === 'B') {
+          quarters[0].secondTeam.name = group.teams[3].name;
+          quarters[1].firstTeam.name = group.teams[0].name;
+          quarters[2].secondTeam.name = group.teams[2].name;
+          quarters[3].firstTeam.name = group.teams[1].name;
         }
       }
-      
-      const classificationArray = Object.keys(classification).map(teamName => {
-        return {...classification[teamName]}
-      }).sort((team1, team2) => {
-        if(team2.points !== team1.points) {
-          return team2.points - team1.points 
-        }
-          
-        return (team2.gm - team2.gs) - (team1.gm - team1.gs);
-      })
-
-      groupStages.push({ name: group.name, teams: classificationArray })
     }
 
+    for(let i = 0; i < quarters.length; i++) {
+      await quarters[i].save();
+      if (quarters[i].winner !== "") {
+        if (i === 0) {
+          semi[0].firstTeam.name = quarters[i].winner;
+        } else if(i === 1) {
+          semi[1].firstTeam.name = quarters[i].winner;
+        } else if(i === 2) {
+          semi[1].secondTeam.name = quarters[i].winner;
+        } else {
+          semi[0].secondTeam.name = quarters[i].winner;
+        }
+      }
+    }
 
+    for(let i = 0; i < semi.length; i++) {
+      await semi[i].save();
+      const winner = semi[i].winner;
+      const looser = winner !== '' && semi[i].firstTeam.name !== winner ? semi[i].firstTeam.name : semi[i].secondTeam.name;
+      console.log(winner);
+      console.log(looser);
+      if(winner !== '' && looser) {
+        if(i === 0) {
+          preFinal[0].firstTeam.name = looser;
+          final[0].firstTeam.name = winner;
+        } else {
+          preFinal[0].secondTeam.name = looser;
+          final[0].secondTeam.name = winner;
+        }
+      }
+    }
 
-    res.send(groupStages);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send(error);
-  }
-});
+    await preFinal[0].save();
+    await final[0].save();
 
-
-// Create a new user
-router.post('/users', async (req, res) => {
-  const { name, email, age } = req.body;
-
-  try {
-    const user = new User({ name, email, age });
-    await user.save();
-    res.send(user);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send(error);
-  }
-});
-
-// Get all users
-router.get('/users', async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send(error);
-  }
-});
-
-// Update a user
-router.put('/users/:id', async (req, res) => {
-  const { id } = req.params;
-  const { name, email, age } = req.body;
-
-  try {
-    const user = await User.findByIdAndUpdate(id, { name, email, age }, { new: true });
-    res.send(user);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send(error);
-  }
-});
-
-// Delete a user
-router.delete('/users/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const user = await User.findByIdAndDelete(id);
-    res.send(user);
-  } catch (error) {
+    res.send({ quarters, semi, preFinal, final })
+  } catch(error) {
     console.error(error);
     res.status(500).send(error);
   }
