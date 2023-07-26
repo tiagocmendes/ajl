@@ -1,19 +1,6 @@
 // The URL to which you want to make the POST request
 const url = 'http://localhost:8080/games';
 
-const teams = [
-    'AL CFV',
-    'SEM NOME',
-    'PAVIMIKE FC',
-    'FERRAGENS PEREIRA',
-    'VM CAR AUTOMÓVEIS',
-    '100 PERNAS',
-    "TASCA D'ALDEIA",
-    'RO SERRALHARIA',
-    "GABRIEL TEAM",
-    "3 POR 1",
-];
-
 const groups = [
     {
         name: "A",
@@ -71,11 +58,40 @@ function generateGroupCombinations(teams) {
     }
     
     return combinations;
-  }
+  
+}
+
+const groupsCombinations = {
+    "A": [
+        { firstTeam: 'AL CFV', secondTeam: 'SEM NOME' },
+        { firstTeam: '3 POR 1', secondTeam: 'VM CAR AUTOMÓVEIS' },
+        { firstTeam: 'AL CFV', secondTeam: 'FERRAGENS PEREIRA' },
+        { firstTeam: 'SEM NOME', secondTeam: '3 POR 1' },
+        { firstTeam: 'VM CAR AUTOMÓVEIS', secondTeam: 'FERRAGENS PEREIRA' },
+        { firstTeam: 'AL CFV', secondTeam: '3 POR 1' },
+        { firstTeam: 'SEM NOME', secondTeam: 'VM CAR AUTOMÓVEIS' },
+        { firstTeam: '3 POR 1', secondTeam: 'FERRAGENS PEREIRA' },
+        { firstTeam: 'AL CFV', secondTeam: 'VM CAR AUTOMÓVEIS' },
+        { firstTeam: 'SEM NOME', secondTeam: 'FERRAGENS PEREIRA' },
+    ],
+    "B": 
+    [
+        { firstTeam: 'RO SERRALHARIA', secondTeam: "TASCA D'ALDEIA" },
+        { firstTeam: '100 PERNAS', secondTeam: 'RECONSTRUÇÕES ELMORE' },
+        { firstTeam: 'RO SERRALHARIA', secondTeam: 'PAVIMIKE FC' },
+        { firstTeam: "TASCA D'ALDEIA", secondTeam: '100 PERNAS' },
+        { firstTeam: 'RECONSTRUÇÕES ELMORE', secondTeam: 'PAVIMIKE FC' },
+        { firstTeam: 'RO SERRALHARIA', secondTeam: '100 PERNAS' },
+        { firstTeam: "TASCA D'ALDEIA", secondTeam: 'RECONSTRUÇÕES ELMORE' },
+        { firstTeam: '100 PERNAS', secondTeam: 'PAVIMIKE FC' },
+        { firstTeam: 'RO SERRALHARIA', secondTeam: 'RECONSTRUÇÕES ELMORE' },
+        { firstTeam: "TASCA D'ALDEIA", secondTeam: 'PAVIMIKE FC' },
+    ]
+}
 
 const games = [];
 for(const group of groups) {
-    const groupCombinations = generateGroupCombinations(group.teams);
+    const groupCombinations = groupsCombinations[group.name]
     let timestamp = 0;
 
     for(const combination of groupCombinations) {
