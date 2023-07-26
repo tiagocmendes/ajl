@@ -1,15 +1,22 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import AuthContext from '../../../store/AuthContext';
 import { StyledResultsContainer, StyledTournamentPhase,  
     StyledHeader, StyledBody, StyledBodyRow, StyledCell,
     StyleGameNumberCell,
 } from './style';
 
+import { routes } from '../../../routes';
+
 const GamesList = () => {
     const navigate = useNavigate();
     const [games, setGames] = useState([]);
+    const { isAuthenticated } = useContext(AuthContext);
+
+    if (!isAuthenticated) {
+        navigate('/');
+    }
 
     const getDateAndTime = (timeStamp) => {
         const date = new Date(Number(timeStamp));
@@ -41,8 +48,8 @@ const GamesList = () => {
     useEffect(() => {
         const fetchGames = async () => {
             try {
-                await axios.get(`http://localhost:8080/knockouts`);
-                const response = await axios.get(`http://localhost:8080/games`);
+                await axios.get(routes.knockouts);
+                const response = await axios.get(routes.games);
                 setGames(response.data);
             } catch (error) {
                 console.error(error);

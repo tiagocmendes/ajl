@@ -1,43 +1,55 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import CryptoJS from 'crypto-js';
-
+import AuthContext from "../../store/AuthContext";
 import { StyledOuterDiv, StyledPasswordInput, StyledLoginBtn } from './style';
 
+import { routes } from "../../routes";
+
 const Management = () => {
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
+    const authContext = useContext(AuthContext);
 
-    const secretKey = 'my_secret_key';
+    const handleEmailChange = (e) => {
+      setEmail(e.target.value);
+    }
 
-    const handleInputChange = (e) => {
+    const handlePasswordChange = (e) => {
       setPassword(e.target.value);
     }
 
-    const decryptText = (encryptedText) => {
-      const bytes = CryptoJS.AES.decrypt(encryptedText, secretKey);
-      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-      return decrypted;
-    };
     
-    const handleLogin = () => {
-      const decryptedText = decryptText('U2FsdGVkX18zaEh37Lg9vetdFJOJvvNPkcDphqyIJKVWS/s7GZAPVQOVj36kVbf6');
-      if(password === decryptedText) {
-        setIsAuthenticated(true);
+    const handleLogin = async () => {
+      if(email !== '' && password !== '') {
+        try {
+          const jsonBody = { email, password }
+          const response = await axios.post(routes.login, jsonBody);
+          console.log('Login successfully:', response.data);
+          if(response.data.token) {
+            authContext.isAuthenticated = true;
+            authContext.token = response.data.token;
+            navigate('/management/games')
+          }
+          
+        } catch (error) {
+          console.error('Error updating game:', error.message);
+        }
       }
     }
 
     useEffect(() => {
-      if(isAuthenticated) {
+      if(authContext.isAuthenticated) {
         navigate('/management/games');
       }
-    }, [isAuthenticated, navigate])
+    }, [authContext.isAuthenticated, navigate])
 
 
     return (
       <StyledOuterDiv>
-        <StyledPasswordInput type="password"  placeholder={'Password'} onChange={(e) => handleInputChange(e)} />
+        <StyledPasswordInput type="text"  placeholder={'Email'} onChange={(e) => handleEmailChange(e)} />
+        <StyledPasswordInput type="password"  placeholder={'Password'} onChange={(e) => handlePasswordChange(e)} />
           <StyledLoginBtn onClick={handleLogin}>
               Login
           </StyledLoginBtn>

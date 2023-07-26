@@ -6,6 +6,7 @@ export const StyledOuterDiv = styled.div`
     justify-content: center;
     align-items: center;
     min-height: 90vh;
+    gap: 1rem;
 `
 
 export const StyledPasswordInput = styled.input`
@@ -25,7 +26,6 @@ export const StyledLoginBtn = styled.div`
     padding: 1rem 5rem;
     background-color: #424141;
     color: white;
-    margin-top: 2rem;
     cursor: pointer;
 
     &:hover {

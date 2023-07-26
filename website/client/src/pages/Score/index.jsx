@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 
+import { routes } from '../../routes';
+
 import { 
     ScoreContainer, StyledGroupStages, StyledTable, StyledTableHeader,
     StyledTableRow, StyledTableCell, StyledTeamNameCell,
@@ -16,7 +18,7 @@ const Score = () => {
     useEffect(() => {
         const fetchClassification = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/groups`);
+                const response = await axios.get(routes.groups);
                 setGroupStages(response.data)
             } catch (error) {
                 console.error(error);
@@ -25,7 +27,7 @@ const Score = () => {
 
         const fetchKnockouts = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/knockouts`);
+                const response = await axios.get(routes.knockouts);
                 setKnockoutStages(response.data)
             } catch (error) {
                 console.error(error);

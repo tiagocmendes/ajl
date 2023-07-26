@@ -1,9 +1,32 @@
 const express = require('express');
+const User = require('./models/user')
 const Game = require('./models/game');
+const jwt = require('jsonwebtoken');
+const CryptoJS = require('crypto-js');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const router = express.Router();
 
 const { getGroupsClassification } = require('./helpers/groups');
+
+// Middleware to check if the token is valid and attach the user object to the request
+const authenticateToken = (req, res, next) => {
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  jwt.verify(token, secretKey, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: 'Invalid token' });
+    }
+    req.user = user;
+    next();
+  });
+};
 
 // Create a new game
 router.post('/games', async (req, res) => {
@@ -48,7 +71,7 @@ router.get('/games/:id', async (req, res) => {
 });
 
 // Delete a game by ID
-router.delete('/games/:id', async (req, res) => {
+router.delete('/games/:id', authenticateToken, async (req, res) => {
   const gameId = req.params.id;
 
   try {
@@ -68,9 +91,9 @@ router.delete('/games/:id', async (req, res) => {
 });
 
 // PATCH a game's scorers and goals by ID
-router.patch('/games/:id', async (req, res) => {
+router.patch('/games/:id', authenticateToken, async (req, res) => {
   const gameId = req.params.id;
-  const { firstTeam, secondTeam, hasStarted, winner } = req.body;
+  const { firstTeam, secondTeam, hasStarted, winner, timestamp } = req.body;
 
   try {
     const game = await Game.findOne({ gameNumber: gameId });
@@ -97,8 +120,9 @@ router.patch('/games/:id', async (req, res) => {
       game.secondTeam.goals = secondTeam.goals ? secondTeam.goals : game.secondTeam.goals;
     }
 
-    if(hasStarted !== undefined) {
+    if(hasStarted !== undefined && timestamp !== undefined) {
       game.hasStarted = hasStarted;
+      game.timestamp = timestamp;
     }
 
     if(winner !== undefined) {
@@ -115,7 +139,7 @@ router.patch('/games/:id', async (req, res) => {
   }
 });
 
-router.delete('/games', async (req, res) => {
+router.delete('/games', authenticateToken, async (req, res) => {
   try {
     // Delete all games from the database
     await Game.deleteMany({});
@@ -185,8 +209,6 @@ router.get('/knockouts', async (req, res) => {
       await semi[i].save();
       const winner = semi[i].winner;
       const looser = winner !== '' && semi[i].firstTeam.name !== winner ? semi[i].firstTeam.name : semi[i].secondTeam.name;
-      console.log(winner);
-      console.log(looser);
       if(winner !== '' && looser) {
         if(i === 0) {
           preFinal[0].firstTeam.name = looser;
@@ -207,5 +229,80 @@ router.get('/knockouts', async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+// Helper function to generate a JWT token
+const generateToken = (user) => {
+  return jwt.sign({ id: user.id, username: user.username }, secretKey, { expiresIn: '24h' });
+};
+
+const secretKey = process.env.SECRET_KEY;
+
+const encryptText = (text) => {
+  const encrypted = CryptoJS.AES.encrypt(text, secretKey).toString();
+  return encrypted;
+};
+
+// Function to decrypt text using AES decryption
+const decryptText = (encryptedText) => {
+  const bytes = CryptoJS.AES.decrypt(encryptedText, process.env.SECRET_KEY);
+  const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+  return decrypted;
+};
+
+router.post('/users', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = new User({ email, password: encryptText(password) });
+    await user.save();
+    res.send(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+
+// Login endpoint
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if(!user) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+
+  if (decryptText(user.password) !== password) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+
+  const token = generateToken('user');
+  res.json({ token });
+});
+
+router.get('/users', authenticateToken, async (req, res) => {
+  try {
+    const users = await User.find({});
+
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+router.delete('/users', authenticateToken, async (req, res) => {
+  try {
+    // Delete all games from the database
+    await User.deleteMany({});
+
+    res.json({ message: 'All users deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 module.exports = router;

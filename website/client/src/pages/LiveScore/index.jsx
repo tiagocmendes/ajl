@@ -8,35 +8,30 @@ import {
 
 import logo from '../../assets/images/logo.png';
 
+import { routes } from '../../routes';
+
+import Timer from './Timer';
 
 const LiveScore = () => {
     const { gameId } = useParams();
 
     const [game, setGame] = useState(null);
-    const [gameMinutes, setGameMinutes] = useState(0);
 
-    const updateGameMinutes = () => {
-        if (game) {
-          const startHour = new Date(Number(game.timestamp));
-          const now = new Date("2023/07/29 09:27");
-          const differenceInMilliseconds = now - startHour;
-          const differenceInMinutes = differenceInMilliseconds / 60000;
-          setGameMinutes(differenceInMinutes > 0 ? Math.round(differenceInMinutes): 0);
-        }
-      };
-    
-      useEffect(() => {
-        // Start the interval when the component mounts
-        const interval = setInterval(updateGameMinutes, 1000); // 60000 milliseconds = 1 minute
-    
-        // Clear the interval when the component unmounts
-        return () => clearInterval(interval);
-      }, [updateGameMinutes]);
+    const getDateAndTime = (timeStamp) => {
+        const date = new Date(Number(timeStamp));
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+
+        return `${day}/${month}/${year} ${hours === 9 ? '09' : hours}h${minutes === 0 ? '00' : minutes}`
+    }
 
     useEffect(() => {
         const fetchGameById = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/games/${gameId}`);
+                const response = await axios.get(`${routes.games}/${gameId}`);
                 setGame(response.data);
             } catch (error) {
                 console.error(error);
@@ -51,7 +46,13 @@ const LiveScore = () => {
             <StyledOuterDiv>
                 <img alt="logo" src={logo} style={{height: "15rem"}} />
                 <StyledTitle><h1>Resultado em tempo real</h1></StyledTitle>
-                <StyledTimer><h1>{gameMinutes}'</h1></StyledTimer>
+                <StyledTimer>
+                    { game.hasStarted && game.winner !== '' ? 
+                        <h1>Jogo terminado</h1> : 
+                        game.hasStarted ? <Timer startTimestamp={game.timestamp} /> 
+                        :  <h1>{`Hora de início: ${getDateAndTime(game.timestamp)}`}</h1>
+                    }
+                </StyledTimer>
                 <StyledTableScore>
                     <StyledTableHeader>
                         <StyledTableTeamName><h2>{game.firstTeam.name}</h2></StyledTableTeamName>

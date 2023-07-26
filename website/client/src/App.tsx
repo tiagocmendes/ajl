@@ -6,11 +6,14 @@ import LiveScore from "./pages/LiveScore";
 import Management from "./pages/Management";
 import GamesList from "./pages/Management/GamesList";
 import GameManagement from "./pages/Management/GameManagement";
+import { AuthProvider } from "./store/AuthContext";
+
 
 import './App.css';
 
 const App: React.FC = () => {
   return (
+    <AuthProvider>
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -18,9 +21,9 @@ const App: React.FC = () => {
           <Route path="/management" element={<Management />} />
           <Route path="/management/games" element={<GamesList />} />
           <Route path="/management/games/:gameId" element={<GameManagement />} />
-        </Routes>
+        </Routes>    
       </Router>
-    
+    </AuthProvider>
 );
 }
 

@@ -67,7 +67,16 @@ const getGroupsClassification = async () => {
         if(team2.points !== team1.points) {
           return team2.points - team1.points 
         }
-          
+
+        const headToHeadGame = group.games.find((game) => {
+          const teamsNames = [game.firstTeam.name, game.secondTeam.name];
+          return teamsNames.includes(team1.name) && teamsNames.includes(team2.name);
+        })
+
+        if(headToHeadGame.firstTeam.goals !== headToHeadGame.secondTeam.goals) {
+          return headToHeadGame.firstTeam.goals - headToHeadGame.secondTeam.goals
+        }
+
         return (team2.gm - team2.gs) - (team1.gm - team1.gs);
       })
 

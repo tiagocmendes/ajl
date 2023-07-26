@@ -7,6 +7,8 @@ import { StyledResultsContainer, StyledTournamentPhase,
     StyleGameNumberCell,
 } from './style';
 
+import { routes } from '../../routes';
+
 const Results = () => {
     const navigate = useNavigate();
     const [games, setGames] = useState([]);
@@ -42,8 +44,8 @@ const Results = () => {
     useEffect(() => {
         const fetchGames = async () => {
             try {
-                await axios.get(`http://localhost:8080/knockouts`);
-                const response = await axios.get(`http://localhost:8080/games`);
+                await axios.get(routes.knockouts);
+                const response = await axios.get(routes.games);
 
                 setGames(response.data);
             } catch (error) {

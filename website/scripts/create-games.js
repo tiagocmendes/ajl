@@ -20,9 +20,9 @@ const groups = [
         teams: [
             'AL CFV',
             'SEM NOME',
-            'PAVIMIKE FC',
-            'FERRAGENS PEREIRA',
+            '3 POR 1',
             'VM CAR AUTOMÓVEIS',
+            'FERRAGENS PEREIRA',
         ],
         timestamps: [
             (new Date("2023-07-29 09:00")).getTime(),
@@ -40,11 +40,11 @@ const groups = [
     {
         name: "B",
         teams: [
-            '100 PERNAS',
-            "TASCA D'ALDEIA",
             'RO SERRALHARIA',
-            "GABRIEL TEAM",
-            "3 POR 1",
+            "TASCA D'ALDEIA",
+            '100 PERNAS',
+            "RECONSTRUÇÕES ELMORE",
+            "PAVIMIKE FC",
         ],
         timestamps: [
             (new Date("2023-07-29 09:35")).getTime(),
@@ -77,25 +77,6 @@ const games = [];
 for(const group of groups) {
     const groupCombinations = generateGroupCombinations(group.teams);
     let timestamp = 0;
-    
-    // const firstTeamGoals = Math.round(Math.random() * 4);
-    // const secondTeamGoals = Math.round(Math.random() * 4);
-    // const firstTeamScorers = [];
-    // const secondTeamScorers = [];
-
-    // for(let scorer = 0; scorer < firstTeamGoals; scorer++) {
-    //     firstTeamScorers.push({
-    //         name: "Tiago Mendes",
-    //         minute: Math.round(Math.random() * 30)
-    //     })
-    // }
-
-    // for(let scorer = 0; scorer < secondTeamGoals; scorer++) {
-    //     secondTeamScorers.push({
-    //         name: "Tiago Mendes",
-    //         minute: Math.round(Math.random() * 30)
-    //     })
-    // }
 
     for(const combination of groupCombinations) {
         games.push({

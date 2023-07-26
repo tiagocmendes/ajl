@@ -1,7 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import axios from "axios";
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import AuthContext from "../../../store/AuthContext";
 import { StyledOuterDiv, StyledTeamNamesRow, StyledTeamNameCell, StyledTeamScoreCell, StyledStartGameBtn, StyledScorerInput, StyledScorersRow, ScorerContainer, StyledAddBtn, StyledRemoveBtn } from './style';
+
+import { routes } from "../../../routes";
+
+import Timer from "../../LiveScore/Timer";
 
 const GameManagement = () => {
     const { gameId } = useParams();
@@ -11,8 +16,13 @@ const GameManagement = () => {
     const [ gameEnd, setGameEnd ] = useState((game?.hasStarted && game?.winner !== '') || false)
     const firstTeamScorerRef = useRef();
     const secondTeamScorerRef = useRef();
+    const { isAuthenticated, token } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const [currentMinute, setCurrentMinute] = useState(0);
 
-
+    if (!isAuthenticated) {
+        navigate('/');
+    }
 
     const getDateAndTime = (timeStamp) => {
         const date = new Date(Number(timeStamp));
@@ -27,8 +37,14 @@ const GameManagement = () => {
 
     const handleStartGame = async () => {
         try {
-            const jsonBody = { hasStarted: true }
-            const response = await axios.patch(`http://localhost:8080/games/${gameId}`, jsonBody);
+            const config = {
+                headers: {
+                  Authorization: token,
+                },
+              };
+              
+            const jsonBody = { hasStarted: true, timestamp: (new Date()).getTime() }
+            const response = await axios.patch(`${routes.games}/${gameId}`, jsonBody, config);
             setGameStarted(true);
             console.log('Game updated successfully:', response.data);
           } catch (error) {
@@ -37,15 +53,15 @@ const GameManagement = () => {
     }
 
     const handleEndGame = async () => {
-        console.log(winner)
-
-        console.log(game.firstTeam.name)
-        console.log(game.secondTeam.name)
-
         if(winner === game.firstTeam.name || winner === game.secondTeam.name) {
             try {
+                const config = {
+                    headers: {
+                      Authorization: token,
+                    },
+                  };
                 const jsonBody = { winner }
-                const response = await axios.patch(`http://localhost:8080/games/${gameId}`, jsonBody);
+                const response = await axios.patch(`${routes.games}/${gameId}`, jsonBody, config);
                 setGameEnd(true);
                 setGame(response.data.updatedGame);
                 console.log('Game updated successfully:', response.data);
@@ -66,7 +82,7 @@ const GameManagement = () => {
                         goals: game.firstTeam.goals + 1,
                         scorer: {
                             name: firstTeamScorerRef.current.value,
-                            minute: 18
+                            minute: Number(currentMinute) + 1
                         }
                     } 
                 }
@@ -77,12 +93,17 @@ const GameManagement = () => {
                         goals: game.secondTeam.goals + 1,
                         scorer: {
                             name: secondTeamScorerRef.current.value,
-                            minute: 2
+                            minute: Number(currentMinute) + 1
                         }
                     } 
                 }
             }
-            const response = await axios.patch(`http://localhost:8080/games/${gameId}`, jsonBody);
+            const config = {
+                headers: {
+                  Authorization: token,
+                },
+              };
+            const response = await axios.patch(`${routes.games}/${gameId}`, jsonBody, config);
             setGame(response.data.updatedGame);
             console.log('Game updated successfully:', response.data);
         } catch (error) {
@@ -93,7 +114,7 @@ const GameManagement = () => {
     useEffect(() => {
         const fetchGameById = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/games/${gameId}`);
+                const response = await axios.get(`${routes.games}/${gameId}`);
                 setGame(response.data);
                 setGameStarted(response.data.hasStarted);
                 setGameEnd(response.data.hasStarted && response.data.winner !== '');
@@ -107,7 +128,13 @@ const GameManagement = () => {
     if(game) {
         return (
             <StyledOuterDiv>
-                <StyledTeamNamesRow><h3>Início: {getDateAndTime(game.timestamp)}</h3></StyledTeamNamesRow> 
+                <StyledTeamNamesRow>
+                    { game.hasStarted && game.winner !== '' ? 
+                        <h1>Jogo terminado</h1> : 
+                        game.hasStarted ? <Timer startTimestamp={game.timestamp} setCurrentMinute={(minutes) => setCurrentMinute(minutes)}/> 
+                        : <h1>{`Hora de início: ${getDateAndTime(game.timestamp)}`}</h1>
+                        }
+                </StyledTeamNamesRow> 
                 <StyledTeamNamesRow>
                     <StyledTeamNameCell><h1>{game.firstTeam.name}</h1></StyledTeamNameCell>
                     <StyledTeamScoreCell><h1>{game.hasStarted ? game.firstTeam.goals : '-'}</h1></StyledTeamScoreCell>
