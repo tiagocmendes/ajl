@@ -124,3 +124,16 @@ export const StyledVerticalDivider = styled.div`
   height: 70px; /* Adjust height as needed */
   margin: 0 20px; /* Add spacing around the divider */
 `;
+
+export const StyledDayContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  gap: 0.75rem;
+
+  h3 {
+    color: #2bb572;
+  }
+`;
