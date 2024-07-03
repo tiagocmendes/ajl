@@ -19,7 +19,7 @@ router.get('/teams/:id', async (req, res) => {
 			$and: [{ homeTeam: teamId }, { hasStarted: true }],
 		});
 		const awayMatches = await Match.find({
-			$and: [{ homeTeam: teamId }, { hasStarted: true }],
+			$and: [{ awayTeam: teamId }, { hasStarted: true }],
 		});
 
 		for (const match of homeMatches) {
