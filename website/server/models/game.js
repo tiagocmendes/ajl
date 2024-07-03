@@ -1,70 +1,36 @@
 const mongoose = require('mongoose');
 
-const gameSchema = new mongoose.Schema({
-    gameNumber: {
-        type: Number,
-        required: true,
-        unique: true
-    },
-    phase: {
-        type: String,
-        required: true
-    },
-    hasStarted: {
-        type: Boolean,
-        required: true,
-        default: false
-    },
-    winner: {
-        type: String,
-        default: ''
-    },
-    timestamp: {
-        type:   String,
-        required: true
-    },
-    firstTeam: {
-        name: {
-            type: String,
-            required: true
-        },
-        goals: {
-            type: Number,
-            default: 0
-        },
-        scorers: [{
-            name: {
-                type: String,
-                required: true
-            },
-            minute: {
-                type: Number,
-                required: true
-            }
-        }]
-    },
-    secondTeam: {
-        name: {
-            type: String,
-            required: true
-        },
-        goals: {
-            type: Number,
-            default: 0
-        },
-        scorers: [{
-            name: {
-                type: String,
-                required: true
-            },
-            minute: {
-                type: Number,
-                required: true
-            }
-        }]
-    }
+const playerSchema = new mongoose.Schema({
+	name: { type: String, required: true },
+	teamId: { type: mongoose.Schema.Types.ObjectId, ref: 'Team', required: true },
+	goals: { type: Number, default: 0 },
+	minutes: { type: Number, default: 0 },
+	yellowCards: { type: Number, default: 0 },
+	redCards: { type: Number, default: 0 },
+	picture: { type: String, default: '' },
 });
 
-const Game = mongoose.model('Game', gameSchema)
+const teamSchema = new mongoose.Schema({
+	name: { type: String, required: true },
+	players: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }],
+});
 
-module.exports = Game;
+const matchSchema = new mongoose.Schema({
+	matchNumber: { type: Number, required: true, unique: true },
+	phase: { type: String, required: true },
+	hasStarted: { type: Boolean, required: true, default: false },
+	timestamp: { type: String, required: true },
+	winner: { type: mongoose.Schema.Types.Mixed, ref: 'Team', default: null },
+	homeTeam: { type: mongoose.Schema.Types.Mixed, ref: 'Team', required: true },
+	awayTeam: { type: mongoose.Schema.Types.Mixed, ref: 'Team', required: true },
+	homeScore: { type: Number, default: 0 },
+	awayScore: { type: Number, default: 0 },
+	homeTeamEvents: { type: mongoose.Schema.Types.Array },
+	awayTeamEvents: { type: mongoose.Schema.Types.Array },
+});
+
+const Player = mongoose.model('Player', playerSchema);
+const Team = mongoose.model('Team', teamSchema);
+const Match = mongoose.model('Match', matchSchema);
+
+module.exports = { Player, Team, Match };

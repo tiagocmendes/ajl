@@ -1,89 +1,189 @@
-const Game = require('../models/game');
+const { Match, Team } = require('../models/game');
 
-const initTeamDetails = (name) => {
-    return {
-      name,
-      victories: 0,
-      draws: 0,
-      losses: 0,
-      gm: 0,
-      gs: 0,
-      points: 0
-    }
-}
+const initTeamDetails = team => ({
+	id: team._id,
+	name: team.name,
+	victories: 0,
+	draws: 0,
+	losses: 0,
+	scored: 0,
+	conceded: 0,
+	points: 0,
+	matches: 0,
+});
 
-const getGroupsClassification = async () => {
-    const groupA = await Game.find({ phase: "A" });
-    const groupB = await Game.find({ phase: "B" });
-    const groups = [
-      {name: 'A', games: groupA}, 
-      {name: 'B', games: groupB}, 
-    ];
+const sortMiniLeague = (scoreboard, matches) => {
+	// Count the occurrences of each points value
+	const pointsCount = {};
+	for (const item of scoreboard) {
+		if (pointsCount[item.points]) {
+			pointsCount[item.points]++;
+		} else {
+			pointsCount[item.points] = 1;
+		}
+	}
 
-    const groupStages = [];
-    for(const group of groups) {
-      let classification = {};
-      for(const game of group.games) {
-        const firstTeam = game.firstTeam;
-        const secondTeam = game.secondTeam;
+	// Sort the subarrays with more than 2 entries by the secondary criterion
+	let i = 0;
+	while (i < scoreboard.length) {
+		let j = i;
+		while (
+			j < scoreboard.length &&
+			scoreboard[j].points === scoreboard[i].points
+		) {
+			j++;
+		}
 
-        if(!classification[firstTeam.name]) {
-          classification[firstTeam.name] = initTeamDetails(firstTeam.name)
-        }
+		if (j - i > 2) {
+			scoreboard.slice(i, j).sort((team1, team2) => {
+				if (team2.points !== team1.points) {
+					return team2.points - team1.points;
+				}
 
-        if(!classification[secondTeam.name]) {
-          classification[secondTeam.name] = initTeamDetails(secondTeam.name)
-        }
+				const headToHeadGame = matches.find(match => {
+					const teamsNames = [match.homeTeam.name, match.awayTeam.name];
+					return (
+						teamsNames.includes(team1.name) && teamsNames.includes(team2.name)
+					);
+				});
 
-        if(game.hasStarted) {
-          // Update first team goals
-          classification[firstTeam.name].gm += firstTeam.goals;
-          classification[firstTeam.name].gs += secondTeam.goals;
+				if (headToHeadGame.homeScore !== headToHeadGame.awayScore) {
+					return headToHeadGame.homeScore - headToHeadGame.awayScore;
+				}
 
-          // Update second team goals
-          classification[secondTeam.name].gm += secondTeam.goals;
-          classification[secondTeam.name].gs += firstTeam.goals;
+				const goalsDifference =
+					team2.scored - team2.conceded - (team1.scored - team1.conceded);
 
-          if(firstTeam.goals > secondTeam.goals) {
-            classification[firstTeam.name].victories += 1;
-            classification[secondTeam.name].losses += 1;
-            classification[firstTeam.name].points += 3;
-          } else if(firstTeam.goals < secondTeam.goals) {
-            classification[firstTeam.name].losses += 1;
-            classification[secondTeam.name].victories += 1;
-            classification[secondTeam.name].points += 3;
-          } else {
-            classification[firstTeam.name].draws += 1;
-            classification[secondTeam.name].draws += 1;
-            classification[firstTeam.name].points += 1;
-            classification[secondTeam.name].points += 1;
-          }
-        }
-      }
-      
-      const classificationArray = Object.keys(classification).map(teamName => {
-        return {...classification[teamName]}
-      }).sort((team1, team2) => {
-        if(team2.points !== team1.points) {
-          return team2.points - team1.points 
-        }
+				if (goalsDifference !== 0) {
+					return goalsDifference;
+				}
 
-        const headToHeadGame = group.games.find((game) => {
-          const teamsNames = [game.firstTeam.name, game.secondTeam.name];
-          return teamsNames.includes(team1.name) && teamsNames.includes(team2.name);
-        })
+				const goalsScoredDifference = team2.scored - team1.scored;
+				const goalsConcededDifference = team2.conceded - team1.conceded;
 
-        if(headToHeadGame.firstTeam.goals !== headToHeadGame.secondTeam.goals) {
-          return headToHeadGame.firstTeam.goals - headToHeadGame.secondTeam.goals
-        }
+				if (goalsScoredDifference !== 0) return goalsScoredDifference;
+				if (goalsConcededDifference !== 0) return goalsConcededDifference;
+				return 0;
+			});
+		}
 
-        return (team2.gm - team2.gs) - (team1.gm - team1.gs);
-      })
+		i = j;
+	}
 
-      groupStages.push({ name: group.name, teams: classificationArray })
-    }
+	return scoreboard;
+};
 
-    return groupStages;
-}
+const getGroupsScoreBoard = async () => {
+	const matchesWithoutTeams = await Match.find({ phase: /GROUP/ }).sort({
+		phase: 1,
+	});
+	const allGroupMatches = await Promise.all(
+		matchesWithoutTeams.map(async match => {
+			const homeTeam = await Team.findOne({ _id: match.homeTeam });
+			const awayTeam = await Team.findOne({ _id: match.awayTeam });
+			return { ...match._doc, homeTeam, awayTeam };
+		})
+	);
 
-module.exports = { getGroupsClassification };
+	const matchesByGroup = allGroupMatches.reduce((acc, match) => {
+		if (!acc[match.phase]) {
+			acc[match.phase] = [];
+		}
+
+		acc[match.phase].push(match);
+		return acc;
+	}, {});
+
+	// We need to store the scoreboard of every group
+	const groupsScoreboard = [];
+
+	for (const [group, matches] of Object.entries(matchesByGroup)) {
+		let scoreboard = {};
+
+		for (const match of matches) {
+			const homeTeam = match.homeTeam;
+			const homeScore = match.homeScore;
+			const awayTeam = match.awayTeam;
+			const awayScore = match.awayScore;
+
+			if (!scoreboard[homeTeam.name]) {
+				scoreboard[homeTeam.name] = initTeamDetails(homeTeam);
+			}
+
+			if (!scoreboard[awayTeam.name]) {
+				scoreboard[awayTeam.name] = initTeamDetails(awayTeam);
+			}
+
+			if (match.hasStarted) {
+				// Update first team goals
+				scoreboard[homeTeam.name].scored += homeScore;
+				scoreboard[homeTeam.name].conceded += awayScore;
+
+				// Update seconds team goals
+				scoreboard[awayTeam.name].scored += awayScore;
+				scoreboard[awayTeam.name].conceded += homeScore;
+				scoreboard[homeTeam.name].matches += 1;
+				scoreboard[awayTeam.name].matches += 1;
+
+				if (homeScore > awayScore) {
+					scoreboard[homeTeam.name].victories += 1;
+					scoreboard[homeTeam.name].points += 3;
+					scoreboard[awayTeam.name].losses += 1;
+				} else if (homeScore < awayScore) {
+					scoreboard[homeTeam.name].losses += 1;
+					scoreboard[awayTeam.name].victories += 1;
+					scoreboard[awayTeam.name].points += 3;
+				} else {
+					scoreboard[homeTeam.name].draws += 1;
+					scoreboard[awayTeam.name].draws += 1;
+					scoreboard[homeTeam.name].points += 1;
+					scoreboard[awayTeam.name].points += 1;
+				}
+			}
+		}
+
+		const scoreboardArray = Object.keys(scoreboard)
+			.map(teamName => {
+				return { ...scoreboard[teamName] };
+			})
+			.sort((team1, team2) => {
+				if (team2.points !== team1.points) {
+					return team2.points - team1.points;
+				}
+
+				const headToHeadGame = matches.find(match => {
+					const teamsNames = [match.homeTeam.name, match.awayTeam.name];
+					return (
+						teamsNames.includes(team1.name) && teamsNames.includes(team2.name)
+					);
+				});
+
+				if (headToHeadGame.homeScore !== headToHeadGame.awayScore) {
+					return headToHeadGame.homeScore - headToHeadGame.awayScore;
+				}
+
+				const goalsDifference =
+					team2.scored - team2.conceded - (team1.scored - team1.conceded);
+
+				if (goalsDifference !== 0) {
+					return goalsDifference;
+				}
+
+				const goalsScoredDifference = team2.scored - team1.scored;
+				const goalsConcededDifference = team2.conceded - team1.conceded;
+
+				if (goalsScoredDifference !== 0) return goalsScoredDifference;
+				if (goalsConcededDifference !== 0) return goalsConcededDifference;
+				return 0;
+			});
+
+		groupsScoreboard.push({
+			name: group,
+			teams: sortMiniLeague(scoreboardArray, matches),
+		});
+	}
+
+	return groupsScoreboard;
+};
+
+module.exports = { getGroupsScoreBoard };

@@ -1,124 +1,147 @@
 import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import {
+  groupMatchesByDay,
+  getFormattedDate,
+  getFormattedPhaseName,
+  getFormattedHour,
+} from '../../utils';
 
-import { StyledResultsContainer, StyledTournamentPhase,  
-    StyledHeader, StyledBody, StyledBodyRow, StyledCell,
-    StyleGameNumberCell,
+import {
+  StyledResultsContainer,
+  StyledTournamentPhase,
+  StyledHeader,
+  StyledDivider,
+  StyledPhaseBody,
+  StyledDayContainer,
+  StyledDayMatchesContainer,
+  StyledMatchCard,
+  StyledMatchGroupName,
+  StyledMatchTeamAndScoreNames,
+  StyledMatchCardBody,
+  StyledTeamsNamesContainer,
+  StyledMatchScoreContainer,
+  StyledVerticalDivider,
+  StyledMatchDetailsLabel,
+  StyledMatchDetailsContainer,
 } from './style';
 
 import { routes } from '../../routes';
+import Timer from '../LiveScore/Timer';
 
 const Results = () => {
-    const navigate = useNavigate();
-    const [games, setGames] = useState([]);
+  const navigate = useNavigate();
+  const [matches, setMatches] = useState([]);
 
-    const getDateAndTime = (timeStamp) => {
-        const date = new Date(Number(timeStamp));
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
+  const tournamentPhases = useMemo(() => {
+    if (matches) {
+      const groups = matches.filter((match) => match.phase.includes('GROUP'));
+      const eights = matches.filter((match) => match.phase === 'EIGHTS');
+      const quarters = matches.filter((match) => match.phase === 'QUARTERS');
+      const semis = matches.filter((match) => match.phase === 'SEMI');
+      const preFinal = matches.filter((match) => match.phase === 'PREFINAL');
+      const final = matches.filter((match) => match.phase === 'FINAL');
 
-        return `${day}/${month}/${year} ${hours === 9 ? '09' : hours}h${minutes === 0 ? '00' : minutes}`
+      return [
+        { title: 'Fase de Grupos', matches: groupMatchesByDay(groups) },
+        { title: 'Oitavos-de-Final', matches: groupMatchesByDay(eights) },
+        { title: 'Quartos-de-Final', matches: groupMatchesByDay(quarters) },
+        { title: 'Meia-Final', matches: groupMatchesByDay(semis) },
+        { title: '3º e 4º Lugares', matches: groupMatchesByDay(preFinal) },
+        { title: 'Final', matches: groupMatchesByDay(final) },
+      ];
     }
+  }, [matches]);
 
-    const tournamentPhases = useMemo(() => {
-        if(games) {
-            const groups = games.filter(game => ['A', 'B', 'C'].includes(game.phase));
-            const quarters = games.filter(game => game.phase === 'quarters');
-            const semis = games.filter(game => game.phase === 'semi');
-            const final = games.filter(game => game.phase === 'final');
-            const preFinal = games.filter(game => game.phase === 'pre-final');
-            return [
-                { title: "Fase de Grupos", games: groups },
-                { title: "Quartos-de-Final", games: quarters },
-                { title: "Meia-Final", games: semis },
-                { title: "3º e 4º Lugares", games: preFinal },
-                { title: "Final", games: final }
-            ]
-        }
-    }, [games]) 
-
-    useEffect(() => {
-        const fetchGames = async () => {
-            try {
-                await axios.get(routes.knockouts);
-                const response = await axios.get(routes.games);
-
-                setGames(response.data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        fetchGames();
-    }, []);
-
-    const handleGameClick = (gameId) => {
-        navigate(`/live/${gameId}`);
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        const response = await axios.get(routes.matches);
+        setMatches(response.data);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
-    if(games)
-        return (
-            <StyledResultsContainer>
-                {
-                    tournamentPhases.map(phase => (
-                        <StyledTournamentPhase>
-                            <StyledHeader><h1>{phase.title}</h1></StyledHeader>
-                            <StyledBody>
-                                <StyledBodyRow isHeader>
-                                    <StyleGameNumberCell>
-                                        Nº Jogo
-                                    </StyleGameNumberCell>
-                                    <StyledCell>
-                                        Hora
-                                    </StyledCell>
-                                    <StyledCell>
-                                        Visitado
-                                    </StyledCell>
-                                    <StyledCell>
-                                        Golos Visitado
-                                    </StyledCell>
-                                    <StyledCell>
-                                        Golos Visitante
-                                    </StyledCell>
-                                        <StyledCell>
-                                            Visitante
-                                        </StyledCell>
-                                    </StyledBodyRow>
-                                {
-                                    phase.games.map((game, index) => (
-                                        <StyledBodyRow isEven={index % 2 === 0} onClick={() => handleGameClick(game.gameNumber)}>
-                                            <StyleGameNumberCell>
-                                                {game.gameNumber}
-                                            </StyleGameNumberCell>
-                                            <StyledCell>
-                                                {getDateAndTime(game.timestamp)}
-                                            </StyledCell>
-                                            <StyledCell>
-                                                {game.firstTeam.name}
-                                            </StyledCell>
-                                            <StyledCell>
-                                                {game.hasStarted ? game.firstTeam.goals : '-'}
-                                            </StyledCell>
-                                            <StyledCell>
-                                                {game.hasStarted ? game.secondTeam.goals : '-'}
-                                            </StyledCell>
-                                            <StyledCell>
-                                                {game.secondTeam.name}
-                                            </StyledCell>
-                                        </StyledBodyRow>
-                                    ))
-                                }
-                            </StyledBody>
-                        </StyledTournamentPhase>
-                    ))
-                }
-            </StyledResultsContainer>
-        );
-    return null
-}
+    fetchGames();
+  }, []);
+
+  if (matches)
+    return (
+      <StyledResultsContainer>
+        {tournamentPhases.map((phase) => (
+          <>
+            {!!Object.values(phase.matches).length && (
+              <StyledTournamentPhase key={phase.title}>
+                <StyledHeader>
+                  <h2>{phase.title}</h2>
+                </StyledHeader>
+                <StyledDivider />
+                <StyledPhaseBody>
+                  {Object.values(phase.matches).map((day) => (
+                    <StyledDayContainer key={day.date}>
+                      <h3>{getFormattedDate(day.date)}</h3>
+                      <StyledDayMatchesContainer>
+                        {day.matches.map((match) => (
+                          <StyledMatchCard
+                            key={match._id}
+                            onClick={() => navigate('/live/' + match._id)}
+                          >
+                            <StyledMatchGroupName>
+                              {getFormattedPhaseName(match.phase)}
+                            </StyledMatchGroupName>
+                            <StyledMatchCardBody>
+                              <StyledTeamsNamesContainer>
+                                <StyledMatchTeamAndScoreNames>
+                                  {match.homeTeam.name ?? match.homeTeam}
+                                </StyledMatchTeamAndScoreNames>
+                                <StyledMatchTeamAndScoreNames>
+                                  {match.awayTeam.name ?? match.awayTeam}
+                                </StyledMatchTeamAndScoreNames>
+                              </StyledTeamsNamesContainer>
+                              <StyledMatchScoreContainer
+                                hasStarted={match.hasStarted}
+                              >
+                                <StyledMatchTeamAndScoreNames>
+                                  {match.hasStarted ? match.homeScore : '-'}
+                                </StyledMatchTeamAndScoreNames>
+                                <StyledMatchTeamAndScoreNames>
+                                  {match.hasStarted ? match.awayScore : '-'}
+                                </StyledMatchTeamAndScoreNames>
+                              </StyledMatchScoreContainer>
+                              <StyledVerticalDivider />
+                              <StyledMatchDetailsContainer>
+                                {match.hasStarted ? (
+                                  <>
+                                    {!match.winner ? (
+                                      <Timer startTimestamp={match.timestamp} />
+                                    ) : (
+                                      <StyledMatchDetailsLabel>
+                                        Terminado
+                                      </StyledMatchDetailsLabel>
+                                    )}
+                                  </>
+                                ) : (
+                                  <StyledMatchDetailsLabel>
+                                    {getFormattedHour(match.timestamp)}
+                                  </StyledMatchDetailsLabel>
+                                )}
+                              </StyledMatchDetailsContainer>
+                            </StyledMatchCardBody>
+                          </StyledMatchCard>
+                        ))}
+                      </StyledDayMatchesContainer>
+                    </StyledDayContainer>
+                  ))}
+                </StyledPhaseBody>
+              </StyledTournamentPhase>
+            )}
+          </>
+        ))}
+      </StyledResultsContainer>
+    );
+  return null;
+};
 
 export default Results;

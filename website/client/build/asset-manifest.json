@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/static/css/main.da47b2fd.css",
+    "main.js": "/static/js/main.c89cb79a.js",
+    "static/media/goal.mp3": "/static/media/goal.09c706e5946af48ff486.mp3",
+    "static/media/logo.png": "/static/media/logo.66f26d711ccb2fefb3b6.png",
+    "static/media/start.mp3": "/static/media/start.22361667075113447fb6.mp3",
+    "static/media/foul.mp3": "/static/media/foul.aaa6a61ff5b352c38244.mp3",
+    "index.html": "/index.html",
+    "main.da47b2fd.css.map": "/static/css/main.da47b2fd.css.map",
+    "main.c89cb79a.js.map": "/static/js/main.c89cb79a.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.da47b2fd.css",
+    "static/js/main.c89cb79a.js"
+  ]
+}

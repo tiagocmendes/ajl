@@ -3,17 +3,21 @@ import styled from "styled-components";
 export const HomeContainer = styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     min-height: 100vh;
     color: white;
-`
+`;
 
 export const StyledLogo = styled.div`
     animation: fadeIn 2s;
     @keyframes fadeIn {
-        0% { opacity: 0; }
-        100% { opacity: 1; }
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
     }
 
     & > img {
@@ -25,9 +29,9 @@ export const StyledLogo = styled.div`
         & > img {
             height: auto;
             width: 90vw;
-        }   
+        }
     }
-`
+`;
 
 export const StyledRow = styled.div`
     display: flex;
@@ -35,4 +39,5 @@ export const StyledRow = styled.div`
     justify-content: center;
     align-items: center;
     width: 100%;
-`
+    margin-top: 5rem;
+`;

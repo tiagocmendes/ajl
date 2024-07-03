@@ -1,3 +1,13 @@
+.loader-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: #2bb572;
+    width: 100%;
+}
+
 .box {
     margin: 0 auto;
     width: 40px;

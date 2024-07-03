@@ -58,7 +58,6 @@ function generateGroupCombinations(teams) {
     }
     
     return combinations;
-  
 }
 
 const groupsCombinations = {
