@@ -1,4 +1,4 @@
-const baseUrl = "http://ajlordosa.pt:8080";
+const baseUrl = "https://torneiotemp.ajlordosa.pt/api";
 export const routes = {
   login: `${baseUrl}/auth/login`,
   games: `${baseUrl}/games`,
@@ -11,5 +11,5 @@ export const routes = {
   players: `${baseUrl}/players`,
   teamStats: `${baseUrl}/stats/teams`,
   scorers: `${baseUrl}/stats/players`,
-  ws: baseUrl.replace('http', 'ws'),
+  ws: baseUrl.replace('https', 'wss'),
 };

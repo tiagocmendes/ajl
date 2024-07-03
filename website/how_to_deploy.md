@@ -3,3 +3,6 @@ Build Docker images:
 
 Start Docker images:
 - docker compose up -d
+
+Change client config:
+- Update the routes name!!
