@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=DNAvCtakP9NtmxjhMnWujMr2v6C9
+      - MONGO_INITDB_DATABASE=soccer-tournament
+    volumes:
+      - ./mongo_data:/data/db
+    networks:
+      - mongo_net
+    ports:
+      - 27017:27017
+
+  backend:
+    build: ./server
+    container_name: ajl_server
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    networks:
+      - mongo_net
+
+  client:
+    build: ./client
+    container_name: ajl_client
+    environment:
+      - BASE_URL=http://ajlordosa.pt:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+      - backend
+
+  scripts:
+    build: ./scripts
+    container_name: ajl_scripts
+    environment:
+      - BASE_URL=http://ajl_server:8080
+    depends_on:
+      - mongodb
+      - backend
+    networks:
+      - mongo_net
+    links:
+      - mongodb
+
+networks:
+  mongo_net:

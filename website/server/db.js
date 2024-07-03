@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/soccer-tournament', { useNewUrlParser: true });
+mongoose.connect('mongodb://root:DNAvCtakP9NtmxjhMnWujMr2v6C9@mongodb/soccer-tournament?authSource=admin', { useNewUrlParser: true });
 
 const db = mongoose.connection;
 

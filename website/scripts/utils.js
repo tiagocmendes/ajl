@@ -1,5 +1,6 @@
 const sharp = require('sharp');
 const dotenv = require('dotenv');
+const fetch = require("node-fetch");
 
 dotenv.config();
 

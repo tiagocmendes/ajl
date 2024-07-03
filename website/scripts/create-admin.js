@@ -1,5 +1,7 @@
 const axios = require('axios');
 const { getBaseUrl } = require('./utils');
+const fetch = require("node-fetch");
+
 
 const BASE_URL = getBaseUrl();
 

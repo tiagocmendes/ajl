@@ -1,6 +1,6 @@
 // The URL to which you want to make the POST request
 const url = 'http://localhost:8080/games';
-
+const fetch = require("node-fetch");
 const groups = [
     {
         name: "A",

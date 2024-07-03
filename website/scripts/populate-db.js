@@ -1,4 +1,5 @@
 const { resetDatabase } = require('./delete-all');
+const fetch = require("node-fetch");
 const {
 	createTeams,
 	createPlayers,
