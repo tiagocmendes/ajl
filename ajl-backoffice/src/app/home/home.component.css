@@ -1,0 +1,27 @@
+h4 {
+  font-weight: 500;
+  color: grey;
+}
+
+hr {
+  width: 100%;
+}
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.section-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: fit-content;
+  gap: 2rem;
+  margin-top: 2rem;
+}

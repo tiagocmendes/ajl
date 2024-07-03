@@ -1,0 +1,27 @@
+{
+  "home": {
+    "title": "Welcome",
+    "events": "Events",
+    "members": "Members"
+  },
+  "events": {
+    "title": "Events",
+    "soccerEvent": "Soccer Tournament"
+  },
+  "members": {
+    "title": "Members",
+    "memberNo": "Member No.",
+    "name": "Name",
+    "paymentStatus": "Payment Status",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "searchPlaceholder": "Search member",
+    "noMembers": "No members found!",
+    "all": "All",
+    "email": "Email",
+    "phoneNo": "Phone No."
+  }
+}

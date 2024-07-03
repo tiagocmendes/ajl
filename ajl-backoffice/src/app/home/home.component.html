@@ -1,0 +1,7 @@
+<div class="home-container">
+  <h1>{{ 'home.title' | translate }}, {{ userName }}!</h1>
+  <hr />
+  <div class="section-row">
+    <app-section *ngFor="let section of sections" [name]="section.name" [icon]="section.icon"></app-section>
+  </div>
+</div>

@@ -1,0 +1,48 @@
+<div class="members-list">
+  <div class="filters-row">
+    <input
+      [placeholder]="'members.searchPlaceholder' | translate"
+      (input)="searchMembers($event)"
+    />
+    <form>
+      <select id="paymentStatus" name="paymentStatus" (change)="changePaymentStatusFilter($event)">
+        <option value="" disabled selected>{{ 'members.paymentStatus' | translate }}</option>
+          <option value="all">{{ 'members.all' | translate }}</option>
+          <option value="paid">{{ 'members.paid' | translate }}</option>
+          <option value="unpaid">{{ 'members.unpaid' | translate }}</option>
+      </select>
+    </form>
+    <form>
+      <select id="status" name="status" (change)="changeStatusFilter($event)">
+        <option value="" disabled selected>{{ 'members.status' | translate }}</option>
+        <option value="all">{{ 'members.all' | translate }}</option>
+        <option value="active">{{ 'members.active' | translate }}</option>
+        <option value="inactive">{{ 'members.inactive' | translate }}</option>
+      </select>
+    </form>
+  </div>
+  <h2 *ngIf="members.length === 0; else membersTable">{{ 'members.noMembers' | translate}}</h2>
+  <ng-template #membersTable>
+    <div class="header">
+      <div class="column">{{ 'members.memberNo' | translate }}</div>
+      <div class="column">{{ 'members.name' | translate }}</div>
+      <div class="column">{{ 'members.paymentStatus' | translate }}</div>
+      <div class="column">{{ 'members.status' | translate }}</div>
+    </div>
+    <div
+      class="row"
+      *ngFor="let member of members; let i = index"
+      [ngClass]="{'row-odd': i % 2 !== 0 }"
+      (click)="onClickMember(member)"
+    >
+    <div class="column">{{ member.memberNo }}</div>
+      <div class="column">{{ member.name }}</div>
+      <div class="column" [ngClass]="{'unpaid-status': !membersListService.memberPaidSubscription(member) }">
+        {{ 'members.' + member.paymentStatus | translate }}
+      </div>
+      <div class="column" [ngClass]="{'inactive-status': !membersListService.memberIsActive(member) }">
+        {{ 'members.' + member.status | translate }}
+      </div>
+    </div>
+  </ng-template>
+</div>

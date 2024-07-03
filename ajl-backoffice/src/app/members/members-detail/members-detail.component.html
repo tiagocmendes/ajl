@@ -1,0 +1,18 @@
+<h2>{{ member?.name }}</h2>
+<p><strong>{{ 'members.memberNo' | translate }} {{member?.memberNo}}</strong></p>
+<p *ngIf="!!member?.email"><strong>{{ 'members.email' | translate }}: </strong> {{member?.email}}</p>
+<p *ngIf="!!member?.phoneNo"><strong>{{ 'members.phoneNo' | translate }}: </strong> {{member?.phoneNo}}</p>
+<p>
+  <strong>{{ 'members.status' | translate }}: </strong>
+  <span [ngStyle]="{'color': member?.status === 'active' ? 'green' : 'red'}">
+    {{ 'members.' + member?.status | translate }}
+  </span>
+</p>
+<p>
+  <strong>{{ 'members.paymentStatus' | translate }}: </strong>
+  <span [ngStyle]="{'color': member?.paymentStatus === 'paid' ? 'green' : 'red'}">
+    {{ 'members.' + member?.paymentStatus | translate }}
+  </span>
+</p>
+
+

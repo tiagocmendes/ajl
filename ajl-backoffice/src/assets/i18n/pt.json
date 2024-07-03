@@ -1,0 +1,27 @@
+{
+  "home": {
+    "title": "Bem-vindo",
+    "events": "Eventos",
+    "members": "Sócios"
+  },
+  "events": {
+    "title": "Eventos",
+    "soccerEvent": "Torneio de Futebol de 7"
+  },
+  "members": {
+    "title": "Sócios",
+    "memberNo": "Sócio Nº",
+    "name": "Nome",
+    "paymentStatus": "Quotas",
+    "status": "Estado",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "paid": "Regularizado",
+    "unpaid": "Não Regularizado",
+    "searchPlaceholder": "Pesquisar sócio",
+    "noMembers": "Nenhum sócio encontrado!",
+    "all": "Todos",
+    "email": "Email",
+    "phoneNo": "Telemóvel"
+  }
+}
