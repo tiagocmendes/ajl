@@ -25,7 +25,7 @@ const TEAMS = [
 	teamsData.RO_SERRALHARIA,
 	teamsData.MEGATEC,
 	teamsData.FUT_SEGUNDA_FEIRA_CA_SE_BICA,
-	teamsData.OS_TASCOES,
+	teamsData.BISTAS,
 ];
 
 const main = async () => {
