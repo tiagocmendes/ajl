@@ -12,6 +12,7 @@ const teamsData = {
 			'Alexandre Correia',
 			'André Gonçalves',
 			'Moisés Rodrigues',
+			'Rúben Rodrigues',
 		],
 	},
 	CONDOR_FC: {
