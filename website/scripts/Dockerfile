@@ -2,8 +2,6 @@ FROM node:14
 
 WORKDIR /app
 
-COPY ./ /app/
-
 RUN npm install
 
 RUN npm install node-fetch@2
@@ -15,5 +13,7 @@ RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mon
 RUN apt-get update
 
 RUN apt-get install -y mongodb-mongosh
+
+COPY ./ /app/
 
 CMD ["sh", "-c", "/usr/bin/tail -f /dev/null"]
