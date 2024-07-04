@@ -15,16 +15,16 @@ const { teamsData } = require('./teams-data');
 
 // GLOBAL VARIABLES
 const TEAMS = [
-	teamsData.PESADOS_FC,
-	teamsData.CONDOR_FC,
-	teamsData.SEM_NOME,
-	teamsData.INACREDITAVEL,
-	teamsData.CHIMBARRAO_FC,
-	teamsData.VM_CAR_AUTOMOVEIS,
-	teamsData.RO_SERRALHARIA,
 	teamsData.MEGATEC,
 	teamsData.FUT_SEGUNDA_FEIRA_CA_SE_BICA,
 	teamsData.BISTAS,
+	teamsData.SEM_NOME,
+	teamsData.PESADOS_FC,
+	teamsData.VM_CAR_AUTOMOVEIS,
+	teamsData.CHIMBARRAO_FC,
+	teamsData.CONDOR_FC,
+	teamsData.RO_SERRALHARIA,
+	teamsData.INACREDITAVEL,
 ];
 
 const main = async () => {
