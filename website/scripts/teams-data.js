@@ -124,8 +124,8 @@ const teamsData = {
 		name: 'FUT SEGUNDA CÁ SE BICA',
 		players: [],
 	},
-	OS_TASCOES: {
-		name: 'OS TASCÕES',
+	BISTAS: {
+		name: 'BISTAS',
 		players: [],
 	},
 };
