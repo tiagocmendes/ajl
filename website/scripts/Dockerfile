@@ -2,8 +2,6 @@ FROM node:14
 
 WORKDIR /app
 
-RUN npm install
-
 RUN npm install node-fetch@2
 
 RUN wget -qO- https://www.mongodb.org/static/pgp/server-7.0.asc | tee /etc/apt/trusted.gpg.d/server-7.0.asc
@@ -15,5 +13,7 @@ RUN apt-get update
 RUN apt-get install -y mongodb-mongosh
 
 COPY ./ /app/
+
+RUN npm install
 
 CMD ["sh", "-c", "/usr/bin/tail -f /dev/null"]

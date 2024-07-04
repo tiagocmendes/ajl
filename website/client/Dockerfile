@@ -6,9 +6,9 @@ RUN npm install -g serve
 
 RUN npm install -g javascript-obfuscator
 
-RUN npm install
-
 COPY ./ /app/
+
+RUN npm install
 
 RUN npm run build
 
