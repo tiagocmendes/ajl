@@ -58,8 +58,11 @@ const sortMiniLeague = (scoreboard, matches) => {
 					return goalsDifference;
 				}
 
+				const winsDifference = team2.wins - team1.wins;
+				if (winsDifference !== 0) return winsDifference;
+
 				const goalsScoredDifference = team2.scored - team1.scored;
-				const goalsConcededDifference = team2.conceded - team1.conceded;
+				const goalsConcededDifference = team1.conceded - team2.conceded;
 
 				if (goalsScoredDifference !== 0) return goalsScoredDifference;
 				if (goalsConcededDifference !== 0) return goalsConcededDifference;
@@ -169,8 +172,11 @@ const getGroupsScoreBoard = async () => {
 					return goalsDifference;
 				}
 
+				const winsDifference = team2.wins - team1.wins;
+				if (winsDifference !== 0) return winsDifference;
+
 				const goalsScoredDifference = team2.scored - team1.scored;
-				const goalsConcededDifference = team2.conceded - team1.conceded;
+				const goalsConcededDifference = team1.conceded - team2.conceded;
 
 				if (goalsScoredDifference !== 0) return goalsScoredDifference;
 				if (goalsConcededDifference !== 0) return goalsConcededDifference;
