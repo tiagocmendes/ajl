@@ -77,7 +77,7 @@ const teamsData = {
 			'Guilherme Neves',
 			'Henrique Lopes',
 			'Bruno Almeida',
-			'Afonso Vilar',
+			'João Edgar',
 			'Tiago Salgueiro',
 			'João Correia',
 		],
@@ -110,7 +110,7 @@ const teamsData = {
 			'Gonçalo Coelho',
 			'Diogo Matos',
 			'João Martins',
-			'Hugo Tavares',
+			'Filipe Soares',
 			'Guilherme Oliveira',
 			'Rui Matos',
 			'Ricardo Oliveira',
@@ -118,7 +118,18 @@ const teamsData = {
 	},
 	MEGATEC: {
 		name: 'MEGATEC',
-		players: [],
+		players: [
+			"Flavio Alves",
+			"António Manuel Carvalho Vale",
+			"André Miguel Pereira Monteiro",
+			"Hugo Miguel Teixeira",
+			"Rui Filipe Couto Loureiro",
+			"Ângelo Humberto Leite Fortes",
+			"Paulo António Rodrigues Lopes",
+			"Pedro Gonçalo Monteiro Bernardo",
+			"Rui Miguel Moreira Abade",
+			"Carlos Arede",
+		],
 	},
 	FUT_SEGUNDA_FEIRA_CA_SE_BICA: {
 		name: 'FUT SEGUNDA CÁ SE BICA',
@@ -138,6 +149,7 @@ const teamsData = {
 			'Gonçalo Cardozo',
 			'Pedro Violas',
 			'Diogo Caramelo',
+			'Totti'
 		],
 	},
 };
