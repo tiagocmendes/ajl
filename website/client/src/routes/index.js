@@ -1,4 +1,4 @@
-const baseUrl = "https://torneiotemp.ajlordosa.pt/api";
+const baseUrl = "https://torneio.ajlordosa.pt/api";
 export const routes = {
   login: `${baseUrl}/auth/login`,
   games: `${baseUrl}/games`,

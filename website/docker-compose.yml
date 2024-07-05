@@ -20,11 +20,13 @@ services:
     container_name: mongodb
     restart: always    
     environment:
+      - TZ=Europe/Lisbon
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=DNAvCtakP9NtmxjhMnWujMr2v6C9
       - MONGO_INITDB_DATABASE=soccer-tournament
     volumes:
       - ./mongo_data:/data/db
+      - /etc/timezone:/etc/timezone
     networks:
       - mongo_net
     ports:
@@ -34,6 +36,10 @@ services:
     build: ./server
     container_name: ajl_server
     restart: always
+    environment:
+      - TZ=Europe/Lisbon
+    volumes:
+      - /etc/timezone:/etc/timezone
     ports:
       - "8080:8080"
     depends_on:
@@ -45,7 +51,10 @@ services:
     build: ./client
     container_name: ajl_client
     restart: always
+    volumes:
+      - /etc/timezone:/etc/timezone
     environment:
+      - TZ=Europe/Lisbon
       - BASE_URL=http://ajlordosa.pt:8080
     ports:
       - "3000:3000"
@@ -59,7 +68,10 @@ services:
     build: ./scripts
     container_name: ajl_scripts
     restart: always
+    volumes:
+      - /etc/timezone:/etc/timezone
     environment:
+      - TZ=Europe/Lisbon
       - BASE_URL=http://ajl_server:8080
     depends_on:
       - mongodb

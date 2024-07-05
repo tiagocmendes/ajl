@@ -126,7 +126,19 @@ const teamsData = {
 	},
 	BISTAS: {
 		name: 'BISTAS',
-		players: [],
+		players: [
+			'Tomás Marinheiro',
+			'João Silva',
+			'José Félix ',
+			'Félix',
+			'Rafael Melo',
+			'Rodrigo Almeida',
+			'André Almeida',
+			'André Morgado',
+			'Gonçalo Cardozo',
+			'Pedro Violas',
+			'Diogo Caramelo',
+		],
 	},
 };
 
