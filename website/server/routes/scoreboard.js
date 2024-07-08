@@ -19,6 +19,7 @@ const groupHasFinished = group => {
 	return teamsThatFinishedGroup.length === group.teams.length;
 };
 
+
 const updateQuarterMatch = (team, group) => {
 	const quarterMatchIsNotUpdate = typeof team === 'string' && team.length === 2;
 	if (quarterMatchIsNotUpdate) {
