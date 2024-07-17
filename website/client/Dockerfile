@@ -8,7 +8,7 @@ RUN npm install -g javascript-obfuscator
 
 COPY ./ /app/
 
-RUN timedatectl set-timezone Europe/Lisbon
+#RUN timedatectl set-timezone Europe/Lisbon
 
 RUN npm install
 

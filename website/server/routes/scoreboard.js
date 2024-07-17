@@ -15,7 +15,7 @@ router.get('/groups', async (req, res) => {
 
 const groupHasFinished = group => {
 	const teamsThatFinishedGroup = group.teams.filter(
-		team => team.matches === group.teams.length - 1
+		team => team.matches === (group.teams.length - 1) * 2
 	);
 
 	return teamsThatFinishedGroup.length === group.teams.length;
